@@ -4,8 +4,10 @@
   "version": "1.0.0",
   "exports": {
     ".": {
-      "import": "./main.js",
-      "require": "./cjs.js"
+      "import": {
+        "default": "./import-default.js"
+      },
+      "default": "./cjs.js"
     },
     "./deep.js": "./deep.js",
     "./deep.json": "./deep.json",

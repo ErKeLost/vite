@@ -148,14 +148,14 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
     name: 'vite:resolve',
 
     async resolveId(id, importer, resolveOpts) {
-      if (
-        id[0] === '\0' ||
-        id.startsWith('virtual:') ||
-        // When injected directly in html/client code
-        id.startsWith('/virtual:')
-      ) {
-        return
-      }
+      // if (
+      //   id[0] === '\0' ||
+      //   id.startsWith('virtual:') ||
+      //   // When injected directly in html/client code
+      //   id.startsWith('/virtual:')
+      // ) {
+      //   return
+      // }
 
       const ssr = resolveOpts?.ssr === true
 
@@ -192,6 +192,7 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
         options,
         targetWeb,
       )
+
       if (resolvedImports) {
         id = resolvedImports
 
@@ -247,7 +248,6 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
           return ensureVersionQuery(res, id, options, depsOptimizer)
         }
       }
-
       // relative
       if (
         id[0] === '.' ||

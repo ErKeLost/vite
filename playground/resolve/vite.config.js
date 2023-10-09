@@ -27,11 +27,14 @@ const generatedContentImports = [
 export default defineConfig({
   resolve: {
     extensions: ['.mjs', '.js', '.es', '.ts'],
-    mainFields: ['custom', 'module'],
-    conditions: ['custom'],
+    // mainFields: ['custom', 'module'],
+    // conditions: ['custom'],
   },
   define: {
     VITE_CONFIG_DEP_TEST: a,
+  },
+  server: {
+    port: 5220,
   },
   plugins: [
     {

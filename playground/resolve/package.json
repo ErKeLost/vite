@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "imports": {
-    "#top-level": "./imports-path/top-level.js",
+    "#top-level": {
+      "node": "./imports-path/top-level.js",
+      "browser": "./imports-path/top-level.js"
+    },
     "#same-level": "./imports-path/same-level.js",
     "#nested/path.js": "./imports-path/nested-path.js",
     "#star/*": "./imports-path/star/*",
