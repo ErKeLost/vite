@@ -148,14 +148,16 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
     name: 'vite:resolve',
 
     async resolveId(id, importer, resolveOpts) {
-      // if (
-      //   id[0] === '\0' ||
-      //   id.startsWith('virtual:') ||
-      //   // When injected directly in html/client code
-      //   id.startsWith('/virtual:')
-      // ) {
-      //   return
-      // }
+      if (
+        id[0] === '\0' ||
+        id.startsWith('virtual:') ||
+        // When injected directly in html/client code
+        id.startsWith('/virtual:')
+      ) {
+        console.log('碰到虚拟模块了 现在需要返回了')
+
+        return
+      }
 
       const ssr = resolveOpts?.ssr === true
 
@@ -164,6 +166,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
       const depsOptimizer = resolveOptions.getDepsOptimizer?.(ssr)
 
       if (id.startsWith(browserExternalId)) {
+        console.log('id 是 带vite 特殊字段的__vite-browser-external')
+
         return id
       }
 
@@ -195,6 +199,7 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
 
       if (resolvedImports) {
         id = resolvedImports
+        console.log('这个是找到 imports 字段的 id', id)
 
         if (resolveOpts.custom?.['vite:import-glob']?.isSubImportsPattern) {
           return id
@@ -222,21 +227,24 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
         const optimizedPath = id.startsWith(FS_PREFIX)
           ? fsPathFromId(id)
           : normalizePath(path.resolve(root, id.slice(1)))
+        console.log('这个应该是监听 fs 的 id', id)
+
         return optimizedPath
       }
 
-      // explicit fs paths that starts with /@fs/*
+      // // explicit fs paths that starts with /@fs/*
       if (asSrc && id.startsWith(FS_PREFIX)) {
         res = fsPathFromId(id)
         // We don't need to resolve these paths since they are already resolved
         // always return here even if res doesn't exist since /@fs/ is explicit
         // if the file doesn't exist it should be a 404.
         debug?.(`[@fs] ${colors.cyan(id)} -> ${colors.dim(res)}`)
+        // console.log("这个是 fs 的 id", id);
         return ensureVersionQuery(res, id, options, depsOptimizer)
       }
 
-      // URL
-      // /foo -> /fs-root/foo
+      // // URL
+      // // /foo -> /fs-root/foo
       if (
         asSrc &&
         id[0] === '/' &&
@@ -245,6 +253,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
         const fsPath = path.resolve(root, id.slice(1))
         if ((res = tryFsResolve(fsPath, options))) {
           debug?.(`[url] ${colors.cyan(id)} -> ${colors.dim(res)}`)
+          // console.log("这个是 url 的 id", id);
+
           return ensureVersionQuery(res, id, options, depsOptimizer)
         }
       }
@@ -257,10 +267,12 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
         const basedir = importer ? path.dirname(importer) : process.cwd()
         const fsPath = path.resolve(basedir, id)
         // handle browser field mapping for relative imports
+        console.log('这个是 relative 的 id', id)
 
         const normalizedFsPath = normalizePath(fsPath)
 
         if (depsOptimizer?.isOptimizedDepFile(normalizedFsPath)) {
+          console.log('相对路径应该走到这里了 depsOptimizer', res)
           // Optimized files could not yet exist in disk, resolve to the full path
           // Inject the current browserHash version if the path doesn't have one
           if (
@@ -283,10 +295,15 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
           options.browserField &&
           (res = tryResolveBrowserMapping(fsPath, importer, options, true))
         ) {
+          console.log('相对路径应该走到这里了 fsPath', fsPath)
+          console.log('相对路径应该走到这里了 tryResolveBrowserMapping', res)
+
           return res
         }
 
         if ((res = tryFsResolve(fsPath, options))) {
+          console.log('相对路径应该走到这里了 tryFsResolve', res)
+          console.log('相对路径应该走到这里了 fsPath', fsPath)
           res = ensureVersionQuery(res, id, options, depsOptimizer)
           debug?.(`[relative] ${colors.cyan(id)} -> ${colors.dim(res)}`)
 
@@ -346,6 +363,7 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
       // bare package imports, perform node resolve
       if (bareImportRE.test(id)) {
         const external = options.shouldExternalize?.(id, importer)
+
         if (
           !external &&
           asSrc &&
@@ -359,6 +377,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
             options.packageCache,
           ))
         ) {
+          console.log('这个是解析 tryOptimizedResolve 的 id', id)
+          console.log('这个是解析 tryOptimizedResolve 的 res', res)
           return res
         }
 
@@ -373,6 +393,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
             external,
           ))
         ) {
+          console.log('这个是解析 tryResolveBrowserMapping 的 id', id)
+          console.log('这个是解析 tryResolveBrowserMapping 的 res', res)
           return res
         }
 
@@ -387,6 +409,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
             external,
           ))
         ) {
+          console.log('这个是解析 tryNodeResolve 的 id', id)
+          console.log('这个是解析 tryNodeResolve 的 res', res)
           return res
         }
 
@@ -590,14 +614,16 @@ function tryCleanFsResolve(
             fileName + fileExt.replace('js', 'ts'),
             preserveSymlinks,
           ))
-        )
+        ) {
           return res
+        }
         // for .js, also try .tsx
         if (
           fileExt === '.js' &&
           (res = tryResolveRealFile(fileName + '.tsx', preserveSymlinks))
-        )
+        ) {
           return res
+        }
       }
 
       if (
@@ -606,8 +632,9 @@ function tryCleanFsResolve(
           extensions,
           preserveSymlinks,
         ))
-      )
+      ) {
         return res
+      }
 
       if (tryPrefix) {
         const prefixed = `${dirPath}/${options.tryPrefix}${path.basename(file)}`
@@ -620,8 +647,9 @@ function tryCleanFsResolve(
             extensions,
             preserveSymlinks,
           ))
-        )
+        ) {
           return res
+        }
       }
     }
   }
@@ -652,8 +680,9 @@ function tryCleanFsResolve(
         extensions,
         preserveSymlinks,
       ))
-    )
+    ) {
       return res
+    }
 
     if (tryPrefix) {
       if (
@@ -662,8 +691,9 @@ function tryCleanFsResolve(
           extensions,
           preserveSymlinks,
         ))
-      )
+      ) {
         return res
+      }
     }
   }
 }
@@ -709,6 +739,7 @@ export function tryNodeResolve(
 
   // check for deep import, e.g. "my-lib/foo"
   const deepMatch = id.match(deepImportRE)
+
   // package name doesn't include postfixes
   // trim them to support importing package with queries (e.g. `import css from 'normalize.css?inline'`)
   const pkgId = deepMatch ? deepMatch[1] || deepMatch[2] : cleanUrl(id)
@@ -979,6 +1010,8 @@ export function resolvePackageEntry(
 
     // resolve exports field with highest priority
     // using https://github.com/lukeed/resolve.exports
+    console.log(data)
+
     if (data.exports) {
       entryPoint = resolveExportsOrImports(
         data,
@@ -990,6 +1023,7 @@ export function resolvePackageEntry(
     }
 
     const resolvedFromExports = !!entryPoint
+    console.log('当前package 没有 exports 字段呢', resolvedFromExports)
 
     // if exports resolved to .mjs, still resolve other fields.
     // This is because .mjs files can technically import .cjs files which would
@@ -1000,6 +1034,8 @@ export function resolvePackageEntry(
       options.browserField &&
       (!entryPoint || entryPoint.endsWith('.mjs'))
     ) {
+      console.log('准备开始检查 browser 字段啦')
+
       // check browser field
       // https://github.com/defunctzombie/package-browser-field-spec
       const browserEntry =
@@ -1039,11 +1075,14 @@ export function resolvePackageEntry(
         }
       }
     }
+    console.log('当前 package 的 entryPoint 是', entryPoint)
 
     // fallback to mainFields if still not resolved
     // TODO: review if `.mjs` check is still needed
     if (!resolvedFromExports && (!entryPoint || entryPoint.endsWith('.mjs'))) {
       for (const field of options.mainFields) {
+        console.log('当前 package 的 field 是', field)
+
         if (field === 'browser') continue // already checked above
         if (typeof data[field] === 'string') {
           entryPoint = data[field]
@@ -1051,7 +1090,11 @@ export function resolvePackageEntry(
         }
       }
     }
+
+    console.log('当前 package 的 entryPoint 是 基本都找了一遍了', entryPoint)
+
     entryPoint ||= data.main
+    console.log('当前 实在没招了 就找 main 字段了', entryPoint)
 
     // try default entry when entry is not define
     // https://nodejs.org/api/modules.html#all-together

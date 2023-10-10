@@ -165,23 +165,16 @@
 <p class="path-contains-sharp-symbol"></p>
 
 <script type="module">
-  // import '@generated-content-virtual-file'
-  // function text(selector, text) {
-  //   document.querySelector(selector).textContent = text
-  // }
+  import '@generated-content-virtual-file'
+  function text(selector, text) {
+    document.querySelector(selector).textContent = text
+  }
 
   // import from a utf-8 bom file
   // import { msg as bomMsg } from './utf8-bom/main.js'
-  // console.log(bomMsg);÷
   // text('.utf8-bom', bomMsg)
-  import { msg } from '@vitejs/test-resolve-exports-path'
-  console.log(msg)
-  text('.exports-entry', msg)
 
-  // import { msg as importsTopLevel } from '#top-level'
-  // text('.imports-top-level', importsTopLevel)
-
-  // // deep import
+  // deep import
   // import slicedToArray from '@babel/runtime/helpers/esm/slicedToArray'
 
   // const iterable = (function* () {
@@ -193,9 +186,12 @@
 
   // text('.deep-import', JSON.stringify(slicedToArray(iterable, 2)))
 
-  // import exportsAndNestedScopeMsg from '@vitejs/test-resolve-exports-and-nested-scope/nested'
+  // import exportsAndNestedScopeMsg from '@vitejs/test-resolve-exports-and-nested-scope'
   // text('.exports-and-nested-scope', exportsAndNestedScopeMsg)
 
+  import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
+  console.log(customMainMsg)
+  text('.custom-main-fields', customMainMsg)
   // // exports field
   // import { msg } from '@vitejs/test-resolve-exports-path'
   // text('.exports-entry', msg)
@@ -344,9 +340,6 @@
 
   // import { msg as customExtMsg } from './custom-ext'
   // text('.custom-ext', customExtMsg)
-
-  // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
-  // text('.custom-main-fields', customMainMsg)
 
   // import { msg as customConditionMsg } from '@vitejs/test-resolve-custom-condition'
   // text('.custom-condition', customConditionMsg)
