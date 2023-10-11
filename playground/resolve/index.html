@@ -170,6 +170,11 @@
     document.querySelector(selector).textContent = text
   }
 
+  import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
+  text('.custom-main-fields', customMainMsg)
+  // imports field
+  // import { msg as importsTopLevel } from '#top-level'
+  // text('.imports-top-level', importsTopLevel)
   // import from a utf-8 bom file
   // import { msg as bomMsg } from './utf8-bom/main.js'
   // text('.utf8-bom', bomMsg)
@@ -189,10 +194,7 @@
   // import exportsAndNestedScopeMsg from '@vitejs/test-resolve-exports-and-nested-scope'
   // text('.exports-and-nested-scope', exportsAndNestedScopeMsg)
 
-  import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
-  console.log(customMainMsg)
-  text('.custom-main-fields', customMainMsg)
-  // // exports field
+  // exports field
   // import { msg } from '@vitejs/test-resolve-exports-path'
   // text('.exports-entry', msg)
 

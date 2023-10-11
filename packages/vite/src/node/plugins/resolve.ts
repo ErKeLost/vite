@@ -409,6 +409,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
             external,
           ))
         ) {
+          console.log(external)
+
           console.log('这个是解析 tryNodeResolve 的 id', id)
           console.log('这个是解析 tryNodeResolve 的 res', res)
           return res
@@ -784,6 +786,7 @@ export function tryNodeResolve(
     }
     return
   }
+  console.log(deepMatch, '我是 deepmatch')
 
   const resolveId = deepMatch ? resolveDeepImport : resolvePackageEntry
   const unresolvedId = deepMatch ? '.' + id.slice(pkgId.length) : id
@@ -1010,7 +1013,6 @@ export function resolvePackageEntry(
 
     // resolve exports field with highest priority
     // using https://github.com/lukeed/resolve.exports
-    console.log(data)
 
     if (data.exports) {
       entryPoint = resolveExportsOrImports(
@@ -1035,6 +1037,7 @@ export function resolvePackageEntry(
       (!entryPoint || entryPoint.endsWith('.mjs'))
     ) {
       console.log('准备开始检查 browser 字段啦')
+      console.log(options)
 
       // check browser field
       // https://github.com/defunctzombie/package-browser-field-spec
