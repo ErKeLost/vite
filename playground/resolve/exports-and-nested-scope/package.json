@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "exports": {
-    ".": "./index.js",
-    "./nested": "./nested-scope/file.js"
+    "./base": "./nested-scope/file.js",
+    ".": "./index.js"
   }
 }

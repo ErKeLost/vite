@@ -169,7 +169,7 @@
   function text(selector, text) {
     document.querySelector(selector).textContent = text
   }
-  import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/nested'
+  import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/base'
   text('.exports-from-root', exportsFromRootMsg)
   // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
   // text('.custom-main-fields', customMainMsg)

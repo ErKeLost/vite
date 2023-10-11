@@ -1182,11 +1182,16 @@ function resolveExportsOrImports(
   })
 
   const fn = type === 'imports' ? imports : exports
+  console.log('我是 pkg', pkg)
+  console.log('我是 key', key)
+
   const result = fn(pkg, key, {
     browser: targetWeb && !additionalConditions.has('node'),
     require: options.isRequire && !additionalConditions.has('import'),
     conditions,
   })
+
+  console.log('我是 result啊', result)
 
   return result ? result[0] : undefined
 }
@@ -1219,6 +1224,8 @@ function resolveDeepImport(
       // resolve without postfix (see #7098)
       const { file, postfix } = splitFileAndPostfix(relativeId)
       console.log('我是file', file)
+      console.log('我是 data', data)
+      console.log('我是 options', options)
 
       const exportsId = resolveExportsOrImports(
         data,
