@@ -169,9 +169,10 @@
   function text(selector, text) {
     document.querySelector(selector).textContent = text
   }
-
-  import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
-  text('.custom-main-fields', customMainMsg)
+  import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/nested'
+  text('.exports-from-root', exportsFromRootMsg)
+  // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
+  // text('.custom-main-fields', customMainMsg)
   // imports field
   // import { msg as importsTopLevel } from '#top-level'
   // text('.imports-top-level', importsTopLevel)
@@ -216,9 +217,6 @@
 
   // import { msg as exportsEnvMsg } from '@vitejs/test-resolve-exports-env'
   // text('.exports-env', exportsEnvMsg)
-
-  // import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/nested'
-  // text('.exports-from-root', exportsFromRootMsg)
 
   // import { msg as exportsLegacyFallbackMsg } from '@vitejs/test-resolve-exports-legacy-fallback/dir'
   // text('.exports-legacy-fallback', exportsLegacyFallbackMsg)

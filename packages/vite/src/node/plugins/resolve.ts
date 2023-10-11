@@ -741,11 +741,12 @@ export function tryNodeResolve(
 
   // check for deep import, e.g. "my-lib/foo"
   const deepMatch = id.match(deepImportRE)
+  console.log(deepMatch)
 
   // package name doesn't include postfixes
   // trim them to support importing package with queries (e.g. `import css from 'normalize.css?inline'`)
   const pkgId = deepMatch ? deepMatch[1] || deepMatch[2] : cleanUrl(id)
-
+  console.log(pkgId, '我是 pkgId')
   let basedir: string
   if (dedupe?.includes(pkgId)) {
     basedir = root
@@ -1212,9 +1213,13 @@ function resolveDeepImport(
 
   // map relative based on exports data
   if (exportsField) {
+    console.log(exportsField)
+
     if (isObject(exportsField) && !Array.isArray(exportsField)) {
       // resolve without postfix (see #7098)
       const { file, postfix } = splitFileAndPostfix(relativeId)
+      console.log('我是file', file)
+
       const exportsId = resolveExportsOrImports(
         data,
         file,
