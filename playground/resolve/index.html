@@ -169,8 +169,11 @@
   function text(selector, text) {
     document.querySelector(selector).textContent = text
   }
-  import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/base'
-  text('.exports-from-root', exportsFromRootMsg)
+  // import * as res from 'solid-js'
+  // import * as data from 'solid-js/dist/dev.js'
+  // console.log(data);
+  // import { msg as exportsFromRootMsg } from 'exports-and-nested-scope'
+  // text('.exports-from-root', exportsFromRootMsg)
   // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
   // text('.custom-main-fields', customMainMsg)
   // imports field
@@ -294,8 +297,8 @@
   // text('.dot', bar())
 
   // // browser field
-  // import main from '@vitejs/test-resolve-browser-field'
-
+  import main from '@vitejs/test-resolve-browser-field/module-a'
+  text('.browser', main)
   // import a from '@vitejs/test-resolve-browser-field/no-ext'
   // import b from '@vitejs/test-resolve-browser-field/no-ext.js' // no substitution
   // import c from '@vitejs/test-resolve-browser-field/ext'

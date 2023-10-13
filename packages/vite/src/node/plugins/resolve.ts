@@ -409,8 +409,6 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
             external,
           ))
         ) {
-          console.log(external)
-
           console.log('这个是解析 tryNodeResolve 的 id', id)
           console.log('这个是解析 tryNodeResolve 的 res', res)
           return res
@@ -741,12 +739,12 @@ export function tryNodeResolve(
 
   // check for deep import, e.g. "my-lib/foo"
   const deepMatch = id.match(deepImportRE)
-  console.log(deepMatch)
+  // console.log(deepMatch)
 
   // package name doesn't include postfixes
   // trim them to support importing package with queries (e.g. `import css from 'normalize.css?inline'`)
   const pkgId = deepMatch ? deepMatch[1] || deepMatch[2] : cleanUrl(id)
-  console.log(pkgId, '我是 pkgId')
+  // console.log(pkgId, '我是 pkgId')
   let basedir: string
   if (dedupe?.includes(pkgId)) {
     basedir = root
@@ -787,9 +785,10 @@ export function tryNodeResolve(
     }
     return
   }
-  console.log(deepMatch, '我是 deepmatch')
+  // console.log(deepMatch, '我是 deepmatch')
 
   const resolveId = deepMatch ? resolveDeepImport : resolvePackageEntry
+
   const unresolvedId = deepMatch ? '.' + id.slice(pkgId.length) : id
 
   let resolved: string | undefined
@@ -808,6 +807,8 @@ export function tryNodeResolve(
       extensions: DEFAULT_EXTENSIONS,
     })
   }
+  console.log(resolved)
+
   if (!resolved) {
     return
   }
@@ -1250,9 +1251,13 @@ function resolveDeepImport(
       )
     }
   } else if (targetWeb && options.browserField && isObject(browserField)) {
+    console.log('走这里来了', browserField)
+
     // resolve without postfix (see #7098)
     const { file, postfix } = splitFileAndPostfix(relativeId)
     const mapped = mapWithBrowserField(file, browserField)
+    console.log('打印出来的 mapped', mapped)
+
     if (mapped) {
       relativeId = mapped + postfix
     } else if (mapped === false) {
