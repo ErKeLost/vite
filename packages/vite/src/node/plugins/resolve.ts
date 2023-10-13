@@ -245,6 +245,7 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
 
       // // URL
       // // /foo -> /fs-root/foo
+
       if (
         asSrc &&
         id[0] === '/' &&
@@ -264,10 +265,14 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
         ((preferRelative || importer?.endsWith('.html')) &&
           startsWithWordCharRE.test(id))
       ) {
+        console.log('这个是 relative 的 id', id)
+
         const basedir = importer ? path.dirname(importer) : process.cwd()
         const fsPath = path.resolve(basedir, id)
+        console.log('这个是 relative 的 fsPath', fsPath)
+        console.log('这个是 relative 的 basedir', basedir)
+
         // handle browser field mapping for relative imports
-        console.log('这个是 relative 的 id', id)
 
         const normalizedFsPath = normalizePath(fsPath)
 
@@ -364,23 +369,23 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
       if (bareImportRE.test(id)) {
         const external = options.shouldExternalize?.(id, importer)
 
-        if (
-          !external &&
-          asSrc &&
-          depsOptimizer &&
-          !options.scan &&
-          (res = await tryOptimizedResolve(
-            depsOptimizer,
-            id,
-            importer,
-            options.preserveSymlinks,
-            options.packageCache,
-          ))
-        ) {
-          console.log('这个是解析 tryOptimizedResolve 的 id', id)
-          console.log('这个是解析 tryOptimizedResolve 的 res', res)
-          return res
-        }
+        // if (
+        //   !external &&
+        //   asSrc &&
+        //   depsOptimizer &&
+        //   !options.scan &&
+        //   (res = await tryOptimizedResolve(
+        //     depsOptimizer,
+        //     id,
+        //     importer,
+        //     options.preserveSymlinks,
+        //     options.packageCache,
+        //   ))
+        // ) {
+        //   console.log('这个是解析 tryOptimizedResolve 的 id', id)
+        //   console.log('这个是解析 tryOptimizedResolve 的 res', res)
+        //   return res
+        // }
 
         if (
           targetWeb &&
@@ -788,6 +793,7 @@ export function tryNodeResolve(
   // console.log(deepMatch, '我是 deepmatch')
 
   const resolveId = deepMatch ? resolveDeepImport : resolvePackageEntry
+  console.log('走的 deep match 是什么', !!deepMatch)
 
   const unresolvedId = deepMatch ? '.' + id.slice(pkgId.length) : id
 
@@ -1183,7 +1189,9 @@ function resolveExportsOrImports(
   })
 
   const fn = type === 'imports' ? imports : exports
-  console.log('我是 pkg', pkg)
+  // console.log('我是 pkg', pkg)
+  console.log(type === 'imports' ? '我走的是 imports' : '我走的是 exports')
+
   console.log('我是 key', key)
 
   const result = fn(pkg, key, {
@@ -1219,14 +1227,14 @@ function resolveDeepImport(
 
   // map relative based on exports data
   if (exportsField) {
-    console.log(exportsField)
+    // console.log(exportsField)
 
     if (isObject(exportsField) && !Array.isArray(exportsField)) {
       // resolve without postfix (see #7098)
       const { file, postfix } = splitFileAndPostfix(relativeId)
-      console.log('我是file', file)
-      console.log('我是 data', data)
-      console.log('我是 options', options)
+      // console.log('我是file', file)
+      // console.log('我是 data', data)
+      // console.log('我是 options', options)
 
       const exportsId = resolveExportsOrImports(
         data,

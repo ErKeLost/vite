@@ -169,17 +169,8 @@
   function text(selector, text) {
     document.querySelector(selector).textContent = text
   }
-  // import * as res from 'solid-js'
-  // import * as data from 'solid-js/dist/dev.js'
-  // console.log(data);
-  // import { msg as exportsFromRootMsg } from 'exports-and-nested-scope'
-  // text('.exports-from-root', exportsFromRootMsg)
-  // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
-  // text('.custom-main-fields', customMainMsg)
-  // imports field
-  // import { msg as importsTopLevel } from '#top-level'
-  // text('.imports-top-level', importsTopLevel)
-  // import from a utf-8 bom file
+
+  // // import from a utf-8 bom file
   // import { msg as bomMsg } from './utf8-bom/main.js'
   // text('.utf8-bom', bomMsg)
 
@@ -195,10 +186,10 @@
 
   // text('.deep-import', JSON.stringify(slicedToArray(iterable, 2)))
 
-  // import exportsAndNestedScopeMsg from '@vitejs/test-resolve-exports-and-nested-scope'
+  // import exportsAndNestedScopeMsg from '@vitejs/test-resolve-exports-and-nested-scope/nested'
   // text('.exports-and-nested-scope', exportsAndNestedScopeMsg)
 
-  // exports field
+  // // exports field
   // import { msg } from '@vitejs/test-resolve-exports-path'
   // text('.exports-entry', msg)
 
@@ -220,6 +211,9 @@
 
   // import { msg as exportsEnvMsg } from '@vitejs/test-resolve-exports-env'
   // text('.exports-env', exportsEnvMsg)
+
+  // import { msg as exportsFromRootMsg } from '@vitejs/test-resolve-exports-from-root/nested'
+  // text('.exports-from-root', exportsFromRootMsg)
 
   // import { msg as exportsLegacyFallbackMsg } from '@vitejs/test-resolve-exports-legacy-fallback/dir'
   // text('.exports-legacy-fallback', exportsLegacyFallbackMsg)
@@ -297,7 +291,7 @@
   // text('.dot', bar())
 
   // // browser field
-  import main from '@vitejs/test-resolve-browser-field/module-a'
+  import main from '@vitejs/test-resolve-browser-field/no-ext'
   text('.browser', main)
   // import a from '@vitejs/test-resolve-browser-field/no-ext'
   // import b from '@vitejs/test-resolve-browser-field/no-ext.js' // no substitution
@@ -343,6 +337,9 @@
 
   // import { msg as customExtMsg } from './custom-ext'
   // text('.custom-ext', customExtMsg)
+
+  // import { msg as customMainMsg } from '@vitejs/test-resolve-custom-main-field'
+  // text('.custom-main-fields', customMainMsg)
 
   // import { msg as customConditionMsg } from '@vitejs/test-resolve-custom-condition'
   // text('.custom-condition', customConditionMsg)
