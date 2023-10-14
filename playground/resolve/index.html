@@ -165,11 +165,15 @@
 <p class="path-contains-sharp-symbol"></p>
 
 <script type="module">
-  import '@generated-content-virtual-file'
+  // import '@generated-content-virtual-file'
   function text(selector, text) {
     document.querySelector(selector).textContent = text
   }
 
+  import * as constants from 'focus-lock/constants'
+  console.log(constants)
+  // import * as ele from 'electron-to-chromium/versions'
+  // console.log(ele)
   // // import from a utf-8 bom file
   // import { msg as bomMsg } from './utf8-bom/main.js'
   // text('.utf8-bom', bomMsg)
@@ -291,8 +295,8 @@
   // text('.dot', bar())
 
   // // browser field
-  import main from '@vitejs/test-resolve-browser-field/no-ext'
-  text('.browser', main)
+  // import main from '@vitejs/test-resolve-browser-field/no-ext'
+  // text('.browser', main)
   // import a from '@vitejs/test-resolve-browser-field/no-ext'
   // import b from '@vitejs/test-resolve-browser-field/no-ext.js' // no substitution
   // import c from '@vitejs/test-resolve-browser-field/ext'

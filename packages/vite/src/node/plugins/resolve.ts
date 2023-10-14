@@ -740,16 +740,21 @@ export function tryNodeResolve(
   externalize?: boolean,
   allowLinkedExternal: boolean = true,
 ): PartialResolvedId | undefined {
+  console.log(id, '我是前面的id')
+
   const { root, dedupe, isBuild, preserveSymlinks, packageCache } = options
 
   // check for deep import, e.g. "my-lib/foo"
   const deepMatch = id.match(deepImportRE)
+
   // console.log(deepMatch)
 
   // package name doesn't include postfixes
+  console.log(deepMatch)
+
   // trim them to support importing package with queries (e.g. `import css from 'normalize.css?inline'`)
   const pkgId = deepMatch ? deepMatch[1] || deepMatch[2] : cleanUrl(id)
-  // console.log(pkgId, '我是 pkgId')
+  console.log(pkgId, '我是 pkgId')
   let basedir: string
   if (dedupe?.includes(pkgId)) {
     basedir = root
@@ -796,6 +801,7 @@ export function tryNodeResolve(
   console.log('走的 deep match 是什么', !!deepMatch)
 
   const unresolvedId = deepMatch ? '.' + id.slice(pkgId.length) : id
+  console.log('unresolvedId', unresolvedId)
 
   let resolved: string | undefined
   try {
@@ -805,6 +811,8 @@ export function tryNodeResolve(
       throw err
     }
   }
+  console.log(resolved, '这是第一次走的时候拿到的')
+
   if (!resolved && options.tryEsmOnly) {
     resolved = resolveId(unresolvedId, pkg, targetWeb, {
       ...options,
@@ -813,7 +821,6 @@ export function tryNodeResolve(
       extensions: DEFAULT_EXTENSIONS,
     })
   }
-  console.log(resolved)
 
   if (!resolved) {
     return
@@ -1010,6 +1017,7 @@ export function resolvePackageEntry(
   options: InternalResolveOptions,
 ): string | undefined {
   const { file: idWithoutPostfix, postfix } = splitFileAndPostfix(id)
+  console.log(id, '我是id')
 
   const cached = getResolvedCache('.', targetWeb)
   if (cached) {
@@ -1021,6 +1029,7 @@ export function resolvePackageEntry(
 
     // resolve exports field with highest priority
     // using https://github.com/lukeed/resolve.exports
+    console.log(data)
 
     if (data.exports) {
       entryPoint = resolveExportsOrImports(
@@ -1045,8 +1054,6 @@ export function resolvePackageEntry(
       (!entryPoint || entryPoint.endsWith('.mjs'))
     ) {
       console.log('准备开始检查 browser 字段啦')
-      console.log(options)
-
       // check browser field
       // https://github.com/defunctzombie/package-browser-field-spec
       const browserEntry =
@@ -1221,6 +1228,7 @@ function resolveDeepImport(
   if (cache) {
     return cache
   }
+  console.log('走进来了', id)
 
   let relativeId: string | undefined | void = id
   const { exports: exportsField, browser: browserField } = data
@@ -1263,6 +1271,8 @@ function resolveDeepImport(
 
     // resolve without postfix (see #7098)
     const { file, postfix } = splitFileAndPostfix(relativeId)
+    console.log(file, '我是 file')
+
     const mapped = mapWithBrowserField(file, browserField)
     console.log('打印出来的 mapped', mapped)
 
@@ -1301,9 +1311,14 @@ function tryResolveBrowserMapping(
   const pkg =
     importer &&
     findNearestPackageData(path.dirname(importer), options.packageCache)
+
+  console.log('先走到mapping browser 里')
+
   if (pkg && isObject(pkg.data.browser)) {
     const mapId = isFilePath ? './' + slash(path.relative(pkg.dir, id)) : id
     const browserMappedPath = mapWithBrowserField(mapId, pkg.data.browser)
+    console.log(browserMappedPath, '我是 browserMappedPath')
+
     if (browserMappedPath) {
       if (
         (res = bareImportRE.test(browserMappedPath)
@@ -1347,10 +1362,14 @@ function mapWithBrowserField(
   relativePathInPkgDir: string,
   map: Record<string, string | false>,
 ): string | false | undefined {
+  console.log(relativePathInPkgDir, 121231321)
   const normalizedPath = path.posix.normalize(relativePathInPkgDir)
+  console.log('我是 normalizedPath', normalizedPath)
 
   for (const key in map) {
     const normalizedKey = path.posix.normalize(key)
+    console.log(123213213, normalizedPath === normalizedKey)
+
     if (
       normalizedPath === normalizedKey ||
       equalWithoutSuffix(normalizedPath, normalizedKey, '.js') ||

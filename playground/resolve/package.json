@@ -39,8 +39,10 @@
     "@vitejs/test-resolve-imports-pkg": "link:./imports-path/other-pkg",
     "@vitejs/test-resolve-linked": "workspace:*",
     "@vitejs/test-resolve-sharp-dir": "link:./sharp-dir",
+    "electron-to-chromium": "^1.4.554",
     "es5-ext": "0.10.62",
     "exports-and-nested-scope": "link:./exports-and-nested-scope",
+    "focus-lock": "^1.0.0",
     "normalize.css": "^8.0.1",
     "solid-js": "^1.8.1"
   }
