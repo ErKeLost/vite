@@ -746,6 +746,10 @@ export function tryNodeResolve(
 
   // check for deep import, e.g. "my-lib/foo"
   const deepMatch = id.match(deepImportRE)
+  console.log(
+    '准备测试 match',
+    '@farm/resolve-browser-field/no-ext'.match(deepImportRE),
+  )
 
   // console.log(deepMatch)
 
@@ -1290,6 +1294,8 @@ function resolveDeepImport(
       !exportsField, // try index only if no exports field
       targetWeb,
     )
+    console.log('这个是fs resolve 之后拿到的', resolved)
+
     if (resolved) {
       debug?.(
         `[node/deep-import] ${colors.cyan(id)} -> ${colors.dim(resolved)}`,
