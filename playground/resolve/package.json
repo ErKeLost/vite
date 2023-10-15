@@ -21,6 +21,7 @@
     "#other-pkg-slash/": "@vitejs/test-resolve-imports-pkg/nest/"
   },
   "dependencies": {
+    "@antv/util": "^3.3.5",
     "@babel/runtime": "^7.23.1",
     "@vitejs/test-require-pkg-with-module-field": "link:./require-pkg-with-module-field",
     "@vitejs/test-resolve-browser-field": "link:./browser-field",
