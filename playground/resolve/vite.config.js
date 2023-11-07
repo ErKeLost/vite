@@ -26,9 +26,9 @@ const generatedContentImports = [
 
 export default defineConfig({
   resolve: {
-    extensions: ['.mjs', '.js', '.es', '.ts'],
-    mainFields: ['browser', 'custom', 'module'],
-    conditions: ['custom'],
+    // extensions: ['.mjs', '.js', '.es', '.ts'],
+    // mainFields: ['browser', 'custom', 'module'],
+    // conditions: ['custom'],
   },
   define: {
     VITE_CONFIG_DEP_TEST: a,
@@ -106,6 +106,7 @@ export default defineConfig({
       '@vitejs/test-require-pkg-with-module-field',
       '@vitejs/test-resolve-sharp-dir',
     ],
+    disabled: true,
   },
   build: {
     copyPublicDir: false,

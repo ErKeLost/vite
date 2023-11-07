@@ -276,6 +276,8 @@ export function resolvePlugin(resolveOptions: InternalResolveOptions): Plugin {
           return normalizedFsPath
         }
         console.log(fsPath, '我是相对路径的解析')
+        console.log(normalizedFsPath, '我是相对路径的格式化解析')
+        console.log(options, '我是相对路径的解析的配置')
 
         if (
           targetWeb &&
