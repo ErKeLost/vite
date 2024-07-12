@@ -164,6 +164,8 @@ cli
         server: cleanOptions(options),
       })
 
+      console.log(server)
+
       if (!server.httpServer) {
         throw new Error('HTTP server not available')
       }
