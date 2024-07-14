@@ -184,7 +184,7 @@ export function setClientErrorHandler(
       msg = '431 Request Header Fields Too Large'
       logger.warn(
         colors.yellow(
-          'Server responded with status code 431. ' +
+          'Farm draws lessons from the methods in vite server.If you encounter such problems, you can directly check the vite related documents.Server responded with status code 431. ' +
             'See https://vitejs.dev/guide/troubleshooting.html#_431-request-header-fields-too-large.',
         ),
       )

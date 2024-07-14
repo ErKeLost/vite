@@ -472,6 +472,7 @@ export async function resolveConfig(
   }
 
   let { configFile } = config
+
   if (configFile !== false) {
     const loadResult = await loadConfigFromFile(
       configEnv,
