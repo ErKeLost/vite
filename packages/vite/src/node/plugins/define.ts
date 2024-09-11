@@ -3,14 +3,14 @@ import { TraceMap, decodedMap, encodedMap } from '@jridgewell/trace-mapping'
 import type { ResolvedConfig } from '../config'
 import type { Plugin } from '../plugin'
 import { escapeRegex } from '../utils'
+import type { Environment } from '../environment'
 import { isCSSRequest } from './css'
 import { isHTMLRequest } from './html'
 
 const nonJsRe = /\.json(?:$|\?)/
 const isNonJsRequest = (request: string): boolean => nonJsRe.test(request)
 const importMetaEnvMarker = '__vite_import_meta_env__'
-const bareImportMetaEnvRe = new RegExp(`${importMetaEnvMarker}(?!\\.)\\b`)
-const importMetaEnvKeyRe = new RegExp(`${importMetaEnvMarker}\\..+?\\b`, 'g')
+const importMetaEnvKeyReCache = new Map<string, RegExp>()
 
 export function definePlugin(config: ResolvedConfig): Plugin {
   const isBuild = config.command === 'build'
@@ -57,8 +57,8 @@ export function definePlugin(config: ResolvedConfig): Plugin {
     }
   }
 
-  function generatePattern(ssr: boolean) {
-    const replaceProcessEnv = !ssr || config.ssr?.target === 'webworker'
+  function generatePattern(environment: Environment) {
+    const replaceProcessEnv = environment.config.webCompatible
 
     const define: Record<string, string> = {
       ...(replaceProcessEnv ? processEnv : {}),
@@ -68,6 +68,8 @@ export function definePlugin(config: ResolvedConfig): Plugin {
     }
 
     // Additional define fixes based on `ssr` value
+    const ssr = environment.config.consumer === 'server'
+
     if ('import.meta.env.SSR' in define) {
       define['import.meta.env.SSR'] = ssr + ''
     }
@@ -80,7 +82,6 @@ export function definePlugin(config: ResolvedConfig): Plugin {
       SSR: ssr + '',
       ...userDefineEnv,
     })
-    const banner = `const ${importMetaEnvMarker} = ${importMetaEnvVal};\n`
 
     // Create regex pattern as a fast check before running esbuild
     const patternKeys = Object.keys(userDefine)
@@ -94,18 +95,27 @@ export function definePlugin(config: ResolvedConfig): Plugin {
       ? new RegExp(patternKeys.map(escapeRegex).join('|'))
       : null
 
-    return [define, pattern, banner] as const
+    return [define, pattern, importMetaEnvVal] as const
   }
 
-  const defaultPattern = generatePattern(false)
-  const ssrPattern = generatePattern(true)
+  const patternsCache = new WeakMap<
+    Environment,
+    readonly [Record<string, string>, RegExp | null, string]
+  >()
+  function getPattern(environment: Environment) {
+    let pattern = patternsCache.get(environment)
+    if (!pattern) {
+      pattern = generatePattern(environment)
+      patternsCache.set(environment, pattern)
+    }
+    return pattern
+  }
 
   return {
     name: 'vite:define',
 
-    async transform(code, id, options) {
-      const ssr = options?.ssr === true
-      if (!ssr && !isBuild) {
+    async transform(code, id) {
+      if (this.environment.config.consumer === 'client' && !isBuild) {
         // for dev we inject actual global defines in the vite client to
         // avoid the transform cost. see the `clientInjection` and
         // `importAnalysis` plugin.
@@ -122,28 +132,47 @@ export function definePlugin(config: ResolvedConfig): Plugin {
         return
       }
 
-      const [define, pattern, banner] = ssr ? ssrPattern : defaultPattern
+      let [define, pattern, importMetaEnvVal] = getPattern(this.environment)
       if (!pattern) return
 
       // Check if our code needs any replacements before running esbuild
       pattern.lastIndex = 0
       if (!pattern.test(code)) return
 
-      const result = await replaceDefine(code, id, define, config)
+      const hasDefineImportMetaEnv = 'import.meta.env' in define
+      let marker = importMetaEnvMarker
 
-      // Replace `import.meta.env.*` with undefined
-      result.code = result.code.replaceAll(importMetaEnvKeyRe, (m) =>
-        'undefined'.padEnd(m.length),
-      )
+      if (hasDefineImportMetaEnv && code.includes(marker)) {
+        // append a number to the marker until it's unique, to avoid if there is a
+        // marker already in the code
+        let i = 1
+        do {
+          marker = importMetaEnvMarker + i++
+        } while (code.includes(marker))
 
-      // If there's bare `import.meta.env` references, prepend the banner
-      if (bareImportMetaEnvRe.test(result.code)) {
-        result.code = banner + result.code
+        if (marker !== importMetaEnvMarker) {
+          define = { ...define, 'import.meta.env': marker }
+        }
+      }
 
-        if (result.map) {
-          const map = JSON.parse(result.map)
-          map.mappings = ';' + map.mappings
-          result.map = map
+      const result = await replaceDefine(this.environment, code, id, define)
+
+      if (hasDefineImportMetaEnv) {
+        // Replace `import.meta.env.*` with undefined
+        result.code = result.code.replaceAll(
+          getImportMetaEnvKeyRe(marker),
+          (m) => 'undefined'.padEnd(m.length),
+        )
+
+        // If there's bare `import.meta.env` references, prepend the banner
+        if (result.code.includes(marker)) {
+          result.code = `const ${marker} = ${importMetaEnvVal};\n` + result.code
+
+          if (result.map) {
+            const map = JSON.parse(result.map)
+            map.mappings = ';' + map.mappings
+            result.map = map
+          }
         }
       }
 
@@ -153,12 +182,12 @@ export function definePlugin(config: ResolvedConfig): Plugin {
 }
 
 export async function replaceDefine(
+  environment: Environment,
   code: string,
   id: string,
   define: Record<string, string>,
-  config: ResolvedConfig,
 ): Promise<{ code: string; map: string | null }> {
-  const esbuildOptions = config.esbuild || {}
+  const esbuildOptions = environment.config.esbuild || {}
 
   const result = await transform(code, {
     loader: 'js',
@@ -166,7 +195,10 @@ export async function replaceDefine(
     platform: 'neutral',
     define,
     sourcefile: id,
-    sourcemap: config.command === 'build' ? !!config.build.sourcemap : true,
+    sourcemap:
+      environment.config.command === 'build'
+        ? !!environment.config.build.sourcemap
+        : true,
   })
 
   // remove esbuild's <define:...> source entries
@@ -218,4 +250,13 @@ function handleDefineValue(value: any): string {
   if (typeof value === 'undefined') return 'undefined'
   if (typeof value === 'string') return value
   return JSON.stringify(value)
+}
+
+function getImportMetaEnvKeyRe(marker: string): RegExp {
+  let re = importMetaEnvKeyReCache.get(marker)
+  if (!re) {
+    re = new RegExp(`${marker}\\..+?\\b`, 'g')
+    importMetaEnvKeyReCache.set(marker, re)
+  }
+  return re
 }
